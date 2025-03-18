@@ -1,0 +1,105 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // O URL do banco de dados
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+model DeveloperProfile {
+  id          String      @id @default(uuid())
+  name        String
+  email       String   @unique
+  value_hour  Int
+  experience  String
+  skill       String[]
+  graduation  String
+  description String
+  title       String
+  portfolio   String
+  wallet      String
+  linkedin    String
+  service_increment Int @default(0)
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+}
+
+model ContractorProfile {
+  id String @id @default(uuid())
+  name String
+  email String @unique
+  country String
+  age Int
+  company String
+  link String
+  closed_contracts Int @default(0)
+}
+
+model Demand {
+  id String @id @default(uuid())
+  title String
+  description String
+  value BigInt
+  token String
+  status String @default("pending")
+  contractor_id String
+  proposal Proposal[]
+  developer_accepect String
+  link_proposal String
+  createdAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+}
+
+model Proposal {
+  id               String     @id @default(uuid())
+  demand           Demand     @relation(fields: [demandId], references: [id])
+  demandId         String
+  developerId      String
+  developerEmail   String
+  proposalValue    String
+  timeEstimated    String
+  negotiation      String?
+  createdAt        DateTime   @default(now())
+}
+
+model Marketplace {
+  id            String          @id @default(uuid())
+  title         String
+  description   String
+  value         BigInt
+  token         String
+  files         MarketplaceFile[] // Relação com arquivos (1 para muitos)
+  category      String          
+  status        MarketplaceStatus @default(DRAFT)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  tags          String[]        // Tags para busca
+}
+
+enum MarketplaceStatus {
+  DRAFT
+  PUBLISHED
+  SOLD
+  ARCHIVED
+}
+
+model MarketplaceFile {
+  id           String    @id @default(uuid())
+  url          String    // URL do S3
+  name         String    // Nome original do arquivo
+  type         FileType  // Tipo de arquivo
+  marketplace  Marketplace @relation(fields: [marketplaceId], references: [id])
+  marketplaceId String
+  createdAt    DateTime  @default(now())
+}
+
+enum FileType {
+  IMAGE
+  VIDEO
+  AUDIO
+  DOCUMENT
+  MODEL_3D
+  OTHER
+}
