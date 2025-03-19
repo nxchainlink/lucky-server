@@ -1,0 +1,1204 @@
+export type AbiType = [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_token",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_receiver",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes2",
+          "name": "msgsender_permissions",
+          "type": "bytes2"
+        },
+        {
+          "internalType": "bytes2",
+          "name": "necessary_permissions",
+          "type": "bytes2"
+        }
+      ],
+      "name": "AccessDenied",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "EnterprisePlanDoesNotExist",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum IPlan.PLAN",
+          "name": "plan",
+          "type": "uint8"
+        }
+      ],
+      "name": "InvalidPlan",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "NoSellerFound",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "name": "SafeERC20FailedOperation",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "SellerMustBeApproved",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "UserAlreadyHasPlan",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "UserIsEnterprise",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "UserIsNotEnterprise",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "UserIsNotSubscribed",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "UserIsValidOrNotActive",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ValidatorCannotBeAddressZero",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "enum IPlan.PLAN",
+          "name": "plan",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "seller",
+          "type": "address"
+        }
+      ],
+      "name": "BuyPlan",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "seller",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "enum IPlan.PLAN",
+          "name": "plan",
+          "type": "uint8"
+        }
+      ],
+      "name": "PlanAdded",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "PERMISSION_ADMIN",
+      "outputs": [
+        {
+          "internalType": "bytes2",
+          "name": "",
+          "type": "bytes2"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "PERMISSION_SUBSCRIPTION_ELITE",
+      "outputs": [
+        {
+          "internalType": "bytes2",
+          "name": "",
+          "type": "bytes2"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "PERMISSION_SUBSCRIPTION_ENTERPRISE",
+      "outputs": [
+        {
+          "internalType": "bytes2",
+          "name": "",
+          "type": "bytes2"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "PERMISSION_SUBSCRIPTION_FREE",
+      "outputs": [
+        {
+          "internalType": "bytes2",
+          "name": "",
+          "type": "bytes2"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "PERMISSION_SUBSCRIPTION_PRO",
+      "outputs": [
+        {
+          "internalType": "bytes2",
+          "name": "",
+          "type": "bytes2"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "PLANS",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "PLAN_ELITE",
+      "outputs": [
+        {
+          "internalType": "uint160",
+          "name": "price",
+          "type": "uint160"
+        },
+        {
+          "internalType": "uint32",
+          "name": "percentage_gains",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint32",
+          "name": "percentage_transactions",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint16",
+          "name": "contacts",
+          "type": "uint16"
+        },
+        {
+          "internalType": "uint16",
+          "name": "projects",
+          "type": "uint16"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "PLAN_FREE",
+      "outputs": [
+        {
+          "internalType": "uint160",
+          "name": "price",
+          "type": "uint160"
+        },
+        {
+          "internalType": "uint32",
+          "name": "percentage_gains",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint32",
+          "name": "percentage_transactions",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint16",
+          "name": "contacts",
+          "type": "uint16"
+        },
+        {
+          "internalType": "uint16",
+          "name": "projects",
+          "type": "uint16"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "PLAN_PRO",
+      "outputs": [
+        {
+          "internalType": "uint160",
+          "name": "price",
+          "type": "uint160"
+        },
+        {
+          "internalType": "uint32",
+          "name": "percentage_gains",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint32",
+          "name": "percentage_transactions",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint16",
+          "name": "contacts",
+          "type": "uint16"
+        },
+        {
+          "internalType": "uint16",
+          "name": "projects",
+          "type": "uint16"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_seller",
+          "type": "address"
+        }
+      ],
+      "name": "addSeller",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_subscriber",
+          "type": "address"
+        }
+      ],
+      "name": "buyEnterprisePlan",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_subscriber",
+          "type": "address"
+        },
+        {
+          "internalType": "enum IPlan.PLAN",
+          "name": "_plan",
+          "type": "uint8"
+        },
+        {
+          "internalType": "address",
+          "name": "_seller",
+          "type": "address"
+        }
+      ],
+      "name": "buyPlan",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_subscriber",
+          "type": "address"
+        }
+      ],
+      "name": "buyPlanFromSeller",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_receiver",
+          "type": "address"
+        }
+      ],
+      "name": "changeReceiver",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_token",
+          "type": "address"
+        }
+      ],
+      "name": "changeToken",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "defaultExpiration",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "enterprise_plans",
+      "outputs": [
+        {
+          "internalType": "uint160",
+          "name": "price",
+          "type": "uint160"
+        },
+        {
+          "internalType": "uint32",
+          "name": "percentage_gains",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint32",
+          "name": "percentage_transactions",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint16",
+          "name": "contacts",
+          "type": "uint16"
+        },
+        {
+          "internalType": "uint16",
+          "name": "projects",
+          "type": "uint16"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_subscriber",
+          "type": "address"
+        }
+      ],
+      "name": "getActivation",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_subscriber",
+          "type": "address"
+        }
+      ],
+      "name": "getExpirationTimestamp",
+      "outputs": [
+        {
+          "internalType": "uint48",
+          "name": "",
+          "type": "uint48"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum IPlan.PLAN",
+          "name": "_plan",
+          "type": "uint8"
+        }
+      ],
+      "name": "getPermissions",
+      "outputs": [
+        {
+          "internalType": "bytes2",
+          "name": "permissions",
+          "type": "bytes2"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_subscriber",
+          "type": "address"
+        }
+      ],
+      "name": "getPlan",
+      "outputs": [
+        {
+          "internalType": "enum IPlan.PLAN",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum IPlan.PLAN",
+          "name": "_plan",
+          "type": "uint8"
+        }
+      ],
+      "name": "getSubscriptionData",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint160",
+              "name": "price",
+              "type": "uint160"
+            },
+            {
+              "internalType": "uint32",
+              "name": "percentage_gains",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint32",
+              "name": "percentage_transactions",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint16",
+              "name": "contacts",
+              "type": "uint16"
+            },
+            {
+              "internalType": "uint16",
+              "name": "projects",
+              "type": "uint16"
+            }
+          ],
+          "internalType": "struct IPlan.plan_data",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_subscriber",
+          "type": "address"
+        }
+      ],
+      "name": "isUserValid",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "receiver",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_seller",
+          "type": "address"
+        }
+      ],
+      "name": "removeSeller",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_subscriber",
+          "type": "address"
+        }
+      ],
+      "name": "renewPlan",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address[]",
+          "name": "_subscribers",
+          "type": "address[]"
+        },
+        {
+          "internalType": "address",
+          "name": "_validator",
+          "type": "address"
+        }
+      ],
+      "name": "renewPlanValidator",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint160",
+          "name": "price",
+          "type": "uint160"
+        },
+        {
+          "internalType": "uint32",
+          "name": "percentage_gains",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint32",
+          "name": "percentage_transactions",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint16",
+          "name": "contacts",
+          "type": "uint16"
+        },
+        {
+          "internalType": "uint16",
+          "name": "projects",
+          "type": "uint16"
+        },
+        {
+          "internalType": "address",
+          "name": "_subscriber",
+          "type": "address"
+        }
+      ],
+      "name": "sellEnterprisePlan",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum IPlan.PLAN",
+          "name": "plan",
+          "type": "uint8"
+        },
+        {
+          "internalType": "address",
+          "name": "_subscriber",
+          "type": "address"
+        }
+      ],
+      "name": "sellPlan",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "sellerPercentage",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "sellerPercentageRecurrent",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "sellers",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "sellers_data",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "approved",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint48",
+          "name": "last_sale",
+          "type": "uint48"
+        },
+        {
+          "internalType": "uint160",
+          "name": "sales",
+          "type": "uint160"
+        },
+        {
+          "internalType": "uint40",
+          "name": "array_index",
+          "type": "uint40"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_subscriber",
+          "type": "address"
+        },
+        {
+          "components": [
+            {
+              "internalType": "bytes2",
+              "name": "permissions",
+              "type": "bytes2"
+            },
+            {
+              "internalType": "bool",
+              "name": "active",
+              "type": "bool"
+            },
+            {
+              "internalType": "address",
+              "name": "seller",
+              "type": "address"
+            },
+            {
+              "internalType": "uint48",
+              "name": "expiration_timestamp",
+              "type": "uint48"
+            }
+          ],
+          "internalType": "struct IPlan.user_plan",
+          "name": "_data",
+          "type": "tuple"
+        }
+      ],
+      "name": "setData",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_expiration",
+          "type": "uint256"
+        }
+      ],
+      "name": "setDefaultExpiration",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_subscriber",
+          "type": "address"
+        },
+        {
+          "internalType": "uint160",
+          "name": "price",
+          "type": "uint160"
+        },
+        {
+          "internalType": "uint32",
+          "name": "percentage_gains",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint32",
+          "name": "percentage_transactions",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint16",
+          "name": "contacts",
+          "type": "uint16"
+        },
+        {
+          "internalType": "uint16",
+          "name": "projects",
+          "type": "uint16"
+        },
+        {
+          "internalType": "bool",
+          "name": "activation",
+          "type": "bool"
+        },
+        {
+          "internalType": "address",
+          "name": "seller",
+          "type": "address"
+        },
+        {
+          "internalType": "uint48",
+          "name": "_expiration_timestamp",
+          "type": "uint48"
+        }
+      ],
+      "name": "setEnterprisePlan",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_subscriber",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes2",
+          "name": "_permissions",
+          "type": "bytes2"
+        }
+      ],
+      "name": "setPermissions",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_subscriber",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes2",
+          "name": "permissions",
+          "type": "bytes2"
+        },
+        {
+          "internalType": "address",
+          "name": "_seller",
+          "type": "address"
+        },
+        {
+          "internalType": "uint48",
+          "name": "_expiration_timestamp",
+          "type": "uint48"
+        }
+      ],
+      "name": "setPlan",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint128",
+          "name": "_percentage",
+          "type": "uint128"
+        },
+        {
+          "internalType": "uint128",
+          "name": "_percentage_recurrent",
+          "type": "uint128"
+        }
+      ],
+      "name": "setSellerPercentage",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint160",
+          "name": "price",
+          "type": "uint160"
+        },
+        {
+          "internalType": "uint32",
+          "name": "percentage_gains",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint32",
+          "name": "percentage_transactions",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint16",
+          "name": "contacts",
+          "type": "uint16"
+        },
+        {
+          "internalType": "uint16",
+          "name": "projects",
+          "type": "uint16"
+        }
+      ],
+      "name": "setSubscriptionDataELITE",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "percentage_gains",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint32",
+          "name": "percentage_transactions",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint16",
+          "name": "contacts",
+          "type": "uint16"
+        },
+        {
+          "internalType": "uint16",
+          "name": "projects",
+          "type": "uint16"
+        }
+      ],
+      "name": "setSubscriptionDataFREE",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint160",
+          "name": "price",
+          "type": "uint160"
+        },
+        {
+          "internalType": "uint32",
+          "name": "percentage_gains",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint32",
+          "name": "percentage_transactions",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint16",
+          "name": "contacts",
+          "type": "uint16"
+        },
+        {
+          "internalType": "uint16",
+          "name": "projects",
+          "type": "uint16"
+        }
+      ],
+      "name": "setSubscriptionDataPRO",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_percentage",
+          "type": "uint256"
+        }
+      ],
+      "name": "setValidatorPercentage",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_subscriber",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "activation",
+          "type": "bool"
+        }
+      ],
+      "name": "toggleUser",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "token",
+      "outputs": [
+        {
+          "internalType": "contract IERC20",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "users_data",
+      "outputs": [
+        {
+          "internalType": "bytes2",
+          "name": "permissions",
+          "type": "bytes2"
+        },
+        {
+          "internalType": "bool",
+          "name": "active",
+          "type": "bool"
+        },
+        {
+          "internalType": "address",
+          "name": "seller",
+          "type": "address"
+        },
+        {
+          "internalType": "uint48",
+          "name": "expiration_timestamp",
+          "type": "uint48"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "validatorPercentage",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ]

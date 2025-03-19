@@ -2,6 +2,7 @@ import { json, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { CreateResponse } from "../utils/CreateResponse";
 import ProposalInterface from "../interfaces/ProposalInterface";
+import { UserData, getUserData, getDataFromUser } from "../../Blockchain/Connections/plan";
 const prisma = new PrismaClient();
 
 class DemandController {
@@ -11,6 +12,20 @@ class DemandController {
             const { id } = req.params;
             const { title, value, description, token_address, link_inspiration } = req.body;
 
+            const {userData, planData} = await getDataFromUser("0x4fb9d3df9348d"); // coloque um address que faça sentido
+
+            if (!userData || !planData) {
+                return res.status(400).json(
+                    CreateResponse(400, false, "user_not_found", "Usuário não encontrado", null)
+                );
+            }
+
+            if (BigInt(planData.projects.toString()) > BigInt(0)) { // buscar do banco de dados e colocar os parâmetros corretos
+                return res.status(401).json(
+                    CreateResponse(401, false, "proposal_limit_reached", "Limite de propostas atingido", null)
+                );
+            }
+            
             if(!title || value <= 0 || !description || !token_address || !link_inspiration){
                 return res.status(401).json(CreateResponse(401, false, "parameters_invalid", "Your parameters is invalid! try again.", ""));
             }
@@ -47,6 +62,20 @@ class DemandController {
         try {
             const { id } = req.params;
             const { developerId, developerEmail, proposalValue, timeEstimated, negotiation } = req.body;
+
+            const {userData, planData} = await getDataFromUser("0x4fb9d3df9348d"); // coloque um address que faça sentido
+
+            if (!userData || !planData) {
+                return res.status(400).json(
+                    CreateResponse(400, false, "user_not_found", "Usuário não encontrado", null)
+                );
+            }
+
+            if (BigInt(planData.projects.toString()) > BigInt(0)) { // buscar do banco de dados e colocar os parâmetros corretos
+                return res.status(401).json(
+                    CreateResponse(401, false, "proposal_limit_reached", "Limite de propostas atingido", null)
+                );
+            }
     
             // Validação dos campos
             if (!id || !developerId || !developerEmail || !proposalValue || !timeEstimated) {
