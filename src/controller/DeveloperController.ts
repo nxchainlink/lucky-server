@@ -19,9 +19,11 @@ class DeveloperController {
                 portfolio, 
                 wallet, 
                 linkedin, 
+                profile_image
             } = req.body;
 
             if(!email || !wallet || !name){
+                console.log(email, wallet, name);
                 return res
                 .status(200)
                 .json(CreateResponse(401, false, "credentials_invalid", "Your credentials is invalid, try again or come back late!", ""));
@@ -33,7 +35,14 @@ class DeveloperController {
                 {where: {email: email}}
             );
 
-            if(DeveloperExist){
+            const ContractorExist = await prisma
+            .contractorProfile
+            .findUnique(
+                {where: {email: email}}
+            );
+
+
+            if(DeveloperExist || ContractorExist){
                 return res.status(401).json(CreateResponse(401, false, "already_exist", "Your email already been created!", ""));
             }
 
@@ -49,7 +58,8 @@ class DeveloperController {
                     title: title,
                     portfolio: portfolio,
                     wallet: wallet,
-                    linkedin: linkedin
+                    profile_image: profile_image,
+                    linkedin: linkedin,
                 }
             });
 
@@ -58,6 +68,7 @@ class DeveloperController {
             .json(CreateResponse(200, true, "profile_complete", "Your profile has been complete", {name: name, email: email, wallet: wallet}))
         }
         catch(err){
+            console.log(err)
             return res
             .status(500)
             .json(CreateResponse(500, false, "user_exist", "User exist! try with your email.", ""))
@@ -79,6 +90,7 @@ class DeveloperController {
                 portfolio,
                 wallet,
                 linkedin,
+                profile_image
             } = req.body;
     
             const existingProfile = await prisma.developerProfile.findUnique({
@@ -108,6 +120,7 @@ class DeveloperController {
                 portfolio: portfolio ?? existingProfile.portfolio,
                 wallet: wallet ?? existingProfile.wallet,
                 linkedin: linkedin ?? existingProfile.linkedin,
+                profile_image: profile_image ?? existingProfile.profile_image
                 
             };
     
@@ -138,22 +151,47 @@ class DeveloperController {
         }
     }
 
-    async getUniqueDeveloper(req:Request, res:Response): Promise<any>{
+    async getUniqueDeveloper(req: Request, res: Response): Promise<any> {
         try {
-            const {id} = req.params;
-
-            const Developer = await prisma.developerProfile.findUnique({where: {id: id}});
-
-            if(!Developer){
-                return res.status(401).json(CreateResponse(401, false, "not_exist_developer", "This developer does not exist yet", ""));
-            }
-
-            return res.status(200).json(CreateResponse(200, true, "developer_find", "Here is the developer", Developer));
+          const { id, email }:any = req.query;
+      
+          const DeveloperId = id
+            ? await prisma.developerProfile.findUnique({ where: { id } })
+            : null;
+      
+          const DeveloperEmail = email
+            ? await prisma.developerProfile.findUnique({ where: { email } })
+            : null;
+      
+          if (!DeveloperId && !DeveloperEmail) {
+            return res.status(401).json(CreateResponse(
+              401,
+              false,
+              "not_exist_developer",
+              "This developer does not exist yet",
+              ""
+            ));
+          }
+      
+          return res.status(200).json(CreateResponse(
+            200,
+            true,
+            "developer_find",
+            "Here is the developer",
+            DeveloperEmail || DeveloperId
+          ));
+        } catch (err) {
+          console.log(err);
+          return res.status(500).json(CreateResponse(
+            500,
+            false,
+            "internal_server",
+            "Error in server, send message to Lucky Level Team! 🚨",
+            ""
+          ));
         }
-        catch(err){
-            return res.status(500).json(CreateResponse(500, false, "internal_server", "Error in server, send message to Lucky Level Team! 🚨", ""))
-        }
-    }
+      }
+      
 }
 
 export default new DeveloperController;

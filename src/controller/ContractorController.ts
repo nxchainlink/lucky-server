@@ -13,8 +13,9 @@ async setContractor(req:Request, res:Response): Promise<any>{
             }
 
             const ContractorExist = await prisma.contractorProfile.findUnique({where: {email: email}});
+            const ProfessionalExist = await prisma.developerProfile.findUnique({where: {email: email}});
 
-            if(ContractorExist){
+            if(ContractorExist || ProfessionalExist){
                 return res.status(401).json(CreateResponse(401, false, "already_exist", "Your email already been created!", ""));
             }
 
@@ -32,6 +33,7 @@ async setContractor(req:Request, res:Response): Promise<any>{
             return res.status(200).json(CreateResponse(200, true, "create_successfully", "Your user has been created successfully", email));
         }
         catch(err){
+            console.log(err);
             return res.status(500).json(CreateResponse(500, false, "internal_server", "Error in server, send message to Lucky Level Team! 🚨", ""));
         }
     }

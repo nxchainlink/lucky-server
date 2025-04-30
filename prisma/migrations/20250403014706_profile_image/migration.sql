@@ -18,6 +18,7 @@ CREATE TABLE "DeveloperProfile" (
     "portfolio" TEXT NOT NULL,
     "wallet" TEXT NOT NULL,
     "linkedin" TEXT NOT NULL,
+    "profile_image" TEXT NOT NULL,
     "service_increment" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updateAt" TIMESTAMP(3) NOT NULL,
