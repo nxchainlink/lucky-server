@@ -374,6 +374,40 @@ class DemandController {
             );
         }
     }
+
+    async getStudioDemand(req: Request, res: Response): Promise<any> {
+        try {
+
+            const { id } = req.query;
+
+            const GetAllDemands = await prisma.demand.findMany(
+                {where: {contractor_id: String(id)}}
+            );
+    
+            if (!GetAllDemands || GetAllDemands.length === 0) {
+                return res.status(500).json(
+                    CreateResponse(500, false, "not_demand_exist", "Nenhuma demanda existe no momento", null)
+                );
+            }
+    
+            // Converter BigInt para String
+            const demandsWithStringBigInt = GetAllDemands.map(demand => {
+                return {
+                    ...demand,
+                    value: demand.value.toString(), // Converta o BigInt para String
+                    createdAt: demand.createdAt.toISOString(), // Certifique-se de que as datas estão em formato ISO
+                    updateAt: demand.updateAt.toISOString() // Certifique-se de que as datas estão em formato ISO
+                };
+            });
+    
+            return res.status(200).json(CreateResponse(201, true, "list_demand", "Todas as demandas disponíveis estão aqui!", { demands: demandsWithStringBigInt }));
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json(
+                CreateResponse(500, false, "internal_server_error", "Erro interno do servidor", null)
+            );
+        }
+    }
     
     
 } 

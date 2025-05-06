@@ -6,7 +6,7 @@ class ContractorController {
 
 async setContractor(req:Request, res:Response): Promise<any>{
         try {
-            const {name, email, country, age, company, link} = req.body;
+            const {name, email, country, age, company, link, wallet} = req.body;
 
             if(!name || !email){
                 return res.status(401).json(CreateResponse(401, false, "credentials_invalid", "Your email or name is invalid, try again!", ""));
@@ -26,7 +26,8 @@ async setContractor(req:Request, res:Response): Promise<any>{
                     country: country,
                     age: age,
                     company: company,
-                    link: link
+                    link: link,
+                    wallet: wallet
                 }
             })
 
@@ -69,6 +70,7 @@ async setContractor(req:Request, res:Response): Promise<any>{
             return res.status(200).json(CreateResponse(200, true, "update_successfully", "Your user has been updated successfully", "No data!"));
         }
         catch(err){
+            console.log(err);
             return res.status(500).json(CreateResponse(500, false, "internal_server", "Error in server, send message to Lucky Level Team! 🚨", ""));
          }
     }
@@ -92,21 +94,27 @@ async setContractor(req:Request, res:Response): Promise<any>{
 
     async getContractor(req:Request, res:Response): Promise<any>{
         try {
-            const { id } = req.params;
+            const { id, email }:any = req.query;
 
-            const GetContractor = await prisma
-            .contractorProfile
-            .findUnique({
-                where: {id}
-            });
+      
+            const ContractorId = id
+                ? await prisma.contractorProfile.findUnique({ where: { id } })
+                : null;
+        
+            const ContractorEmail = email
+                ? await prisma.contractorProfile.findUnique({ where: { email } })
+                : null;
 
-            if(!GetContractor){
+
+            if(!ContractorId && !ContractorEmail){
                 return res.status(401).json(CreateResponse(401, false, "contractor_undefined", "Contractor not found! try again.", ""));
             }
 
-            return res.status(200).json(CreateResponse(200, true, "contractor_find", "Here is the Contractor!", GetContractor));
+
+            return res.status(200).json(CreateResponse(200, true, "contractor_find", "Here is the Contractor!",  ContractorId || ContractorEmail));
         }
         catch(err){
+            console.log(err);
             return res.status(500).json(CreateResponse(500, false, "internal_server", "Error in server, send message to Lucky Level Team! 🚨", ""));
         }
     }

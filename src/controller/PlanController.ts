@@ -16,7 +16,7 @@ class PlanController {
 
             const Plan = await GetPlan( wallet );
 
-            return res.status(200).json(CreateResponse( 200, true, "plan_to_wallet", "This wallet have a plan!", String( Plan) ));
+            return res.status(200).json(CreateResponse( 200, true, "plan_to_wallet", "This wallet have a plan!",  Number(Plan) || Number(0) ));
 
         }catch(err){
             console.error(err);

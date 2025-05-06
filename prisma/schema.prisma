@@ -35,6 +35,7 @@ model ContractorProfile {
   age String
   company String
   link String
+  wallet String
   closed_contracts Int @default(0)
 }
 

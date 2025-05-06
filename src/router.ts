@@ -20,7 +20,7 @@ route.get('/setprofile/developer/unique=view', DeveloperController.getUniqueDeve
 route.post('/setprofile/contractor=create', ContractorController.setContractor);
 route.put('/setprofile/contractor=edit/:id', ContractorController.editContractor);
 route.get('/setprofile/contractor=view', ContractorController.getContractors);
-route.get('/setprofile/contractor=view/:id', ContractorController.getContractor)
+route.get('/setprofile/contractor/unique=view', ContractorController.getContractor)
 
 /// ------------------------ DEMAND ------------------------------------///
 route.post('/demand=create/:id', DemandController.createDemand);
@@ -29,6 +29,7 @@ route.delete('/demand=delete/:id', DemandController.deleteDemand);
 route.put('/demand/match/:demandId/:proposalId', DemandController.acceptProposal);
 route.put('/proposal/:developerId', DemandController.renewProposal);
 route.get('/demand=list', DemandController.getAllDemand);
+route.get('/demand=list/studio', DemandController.getStudioDemand);
 
 /// ------------------------ PLAN ------------------------------------///
 route.get('/plan/:wallet', PlanController.getPlan);
