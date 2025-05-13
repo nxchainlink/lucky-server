@@ -7,12 +7,12 @@ const prisma = new PrismaClient();
 
 class DemandController {
 
-    async createDemand(req:Request, res:Response): Promise<any>{
+    async createDemand(req: Request, res: Response): Promise<any> {
         try {
             const { id } = req.params;
             const { title, value, description, token_address, link_inspiration } = req.body;
 
-            if(!title || value <= 0 || !description || !token_address || !link_inspiration){
+            if (!title || value <= 0 || !description || !token_address || !link_inspiration) {
                 return res.status(401).json(CreateResponse(401, false, "parameters_invalid", "Your parameters is invalid! try again.", ""));
             }
 
@@ -24,63 +24,63 @@ class DemandController {
                     token: token_address,
                     contractor_id: id,
                     developer_accepect: "pending",
-                    link_proposal: link_inspiration         
+                    link_proposal: link_inspiration
                 }
             });
 
             return res.
-            status(200)
-            .json(
-                CreateResponse(200, true, "demand_created", "Your demand has been created successfully", title)
-            );
-        } 
-        catch(err){
+                status(200)
+                .json(
+                    CreateResponse(200, true, "demand_created", "Your demand has been created successfully", title)
+                );
+        }
+        catch (err) {
             console.log(err)
             return res
-            .status(500)
-            .json(
-                CreateResponse(500, false, "internal_server", "Error in server, send message to Lucky Level Team! 🚨", "")
-            );
+                .status(500)
+                .json(
+                    CreateResponse(500, false, "internal_server", "Error in server, send message to Lucky Level Team! 🚨", "")
+                );
         }
     }
 
-    async deleteDemand(req:Request, res:Response) : Promise<any> {
+    async deleteDemand(req: Request, res: Response): Promise<any> {
         try {
 
             const { id } = req.params;
 
-            if ( !id ){
+            if (!id) {
                 return res.status(401).json(CreateResponse(401, false, "parameters_invalid", "Your parameters is invalid! try again.", ""));
             }
 
             const DemandData = await prisma.demand.findUnique(
                 {
-                    where: {id: id}
+                    where: { id: id }
                 }
             );
 
             const ProposalData = await prisma.proposal.findMany(
                 {
-                    where: {demandId: DemandData?.id}
+                    where: { demandId: DemandData?.id }
                 }
             );
 
 
-            for(let i=0; i < ProposalData.length; i ++) {
+            for (let i = 0; i < ProposalData.length; i++) {
 
-                const Dev = await prisma.developerProfile.findUnique({where: {id: ProposalData[i].developerId}});
+                const Dev = await prisma.developerProfile.findUnique({ where: { id: ProposalData[i].developerId } });
 
-                if( Dev ){
+                if (Dev) {
 
                     await prisma.developerProfile.update(
                         {
-                            data: {service_increment: Dev.service_increment - 1},
-                            where: {id: ProposalData[i].developerId}
+                            data: { service_increment: Dev.service_increment - 1 },
+                            where: { id: ProposalData[i].developerId }
                         }
                     )
 
-                }       
-                
+                }
+
             }
 
             await prisma.proposal.deleteMany({
@@ -92,18 +92,18 @@ class DemandController {
             });
 
             return res.
-            status(200)
-            .json(
-                CreateResponse(200, true, "demand_deleted", "Your demand has been deleted successfully", null)
-            );
+                status(200)
+                .json(
+                    CreateResponse(200, true, "demand_deleted", "Your demand has been deleted successfully", null)
+                );
 
-        }catch(err){
+        } catch (err) {
             console.error(err);
             return res
-            .status(500)
-            .json(
-                CreateResponse(500, false, "internal_server", "Error in server, send message to Lucky Level Team! 🚨", err)
-            );
+                .status(500)
+                .json(
+                    CreateResponse(500, false, "internal_server", "Error in server, send message to Lucky Level Team! 🚨", err)
+                );
         }
     }
 
@@ -111,7 +111,7 @@ class DemandController {
         try {
             const { id } = req.params;
             const { developerId, developerEmail, proposalValue, timeEstimated, negotiation } = req.body;
-    
+
             // Validação dos campos
             if (!id || !developerId || !developerEmail || !proposalValue || !timeEstimated) {
                 return res.status(400).json(
@@ -120,22 +120,22 @@ class DemandController {
             }
 
             const DeveloperAccount = await prisma.developerProfile.findUnique(
-                {where: { id: developerId }}
+                { where: { id: developerId } }
             );
 
-            if( !DeveloperAccount ){
+            if (!DeveloperAccount) {
 
                 return res.status(404).json(
                     CreateResponse(404, false, "developer_not_found", "Desenvolvedor não encontrado!", null)
                 );
 
             }
-    
+
             // Verifica se a demanda realmente existe no banco
             const demandExists = await prisma.demand.findUnique({
                 where: { id: id },
             });
-    
+
             if (!demandExists) {
 
                 return res.status(404).json(
@@ -146,7 +146,7 @@ class DemandController {
 
             const ProposalList = await prisma.proposal.findMany(
                 {
-                    where: {demandId: demandExists.id, developerId: DeveloperAccount.id} 
+                    where: { demandId: demandExists.id, developerId: DeveloperAccount.id }
                 }
             );
 
@@ -154,27 +154,27 @@ class DemandController {
                 index => index.developerId === DeveloperAccount.id
             );
 
-            if(Proposal){
+            if (Proposal) {
 
                 return res.status(404).json(
                     CreateResponse(404, false, "proposal_exist", "Você já tem uma propósta", null)
                 );
 
             }
-           
-            
-            const PlanID = await GetPlan( DeveloperAccount.wallet );
 
-            const PlanData: any = await GetDataPlan( PlanID );
 
-            if( DeveloperAccount.service_increment >= PlanData.contacts  ){
+            const PlanID = await GetPlan(DeveloperAccount.wallet);
+
+            const PlanData: any = await GetDataPlan(PlanID);
+
+            if (DeveloperAccount.service_increment >= PlanData.contacts) {
 
                 return res.status(404).json(
                     CreateResponse(404, false, "target_limit", "Você já executou o maximo de propóstas permitida pelo seu plano. Faça um upgrade!", null)
                 );
 
             }
-    
+
             // Criação da proposta
             const newProposal = await prisma.proposal.create({
                 data: {
@@ -184,6 +184,7 @@ class DemandController {
                     proposalValue: String(proposalValue).toString(), // Mantém como string
                     timeEstimated,
                     negotiation: negotiation || "open",
+                    status: "pending"
                 },
                 include: {
                     demand: true, // Inclui os dados da demanda relacionada
@@ -191,15 +192,15 @@ class DemandController {
             });
 
 
-            await prisma.developerProfile.update({ data: {service_increment: DeveloperAccount.service_increment + 1}, where: { id: DeveloperAccount.id}})
-    
+            await prisma.developerProfile.update({ data: { service_increment: DeveloperAccount.service_increment + 1 }, where: { id: DeveloperAccount.id } })
+
             return res.status(201).json(
 
                 CreateResponse(201, true, "proposal_created", "Proposta criada com sucesso", newProposal.demandId)
 
             );
 
-        } 
+        }
         catch (err) {
 
             console.error(err);
@@ -213,77 +214,78 @@ class DemandController {
         }
     }
 
-    async acceptProposal(req:Request, res:Response): Promise<any> {
+    async acceptProposal(req: Request, res: Response): Promise<any> {
         try {
 
             const { demandId, proposalId } = req.params;
+            const { address } = req.body;
+            console.log(address)
 
-            if( !demandId || !proposalId ){
-
+            if (!demandId || !proposalId || !address) {
                 return res.status(400).json(
                     CreateResponse(400, false, "invalid_parameters", "Parâmetros obrigatórios faltando", null)
-                ); 
+                );
 
             }
 
-            const GetDemand = await prisma.demand.findUnique( 
+            const GetDemand = await prisma.demand.findUnique(
                 {
-                    where: {id: demandId}
+                    where: { id: demandId }
                 }
             )
 
             const GetAllDemand = await prisma.proposal.findMany(
                 {
-                    where: {demandId: demandId}
+                    where: { demandId: demandId }
                 }
             )
 
 
-            const DemandAlreadyAccept = GetAllDemand.find(index => index.negotiation === "match");
+            const DemandAlreadyAccept = GetAllDemand.find(index => index.status === "match");
 
-            if( DemandAlreadyAccept ){
+            if (DemandAlreadyAccept) {
 
                 return res.status(400).json(
 
                     CreateResponse(400, false, "demand_already_accept", "Esta demanda já foi aceita.", null)
 
-                ); 
+                );
             }
-            
-            if( !GetDemand ){
+
+            if (!GetDemand) {
 
                 return res.status(400).json(
                     CreateResponse(400, false, "demand_not_exist", "Esta demanda não existe", null)
-                ); 
+                );
 
             }
 
             const GetProposal = await prisma.proposal.findUnique(
                 {
-                    where: {id: proposalId}
+                    where: { id: proposalId }
                 }
             )
 
-            if( !GetProposal ){
+            if (!GetProposal) {
 
                 return res.status(400).json(
 
                     CreateResponse(400, false, "proposal_not_exist", "Esta proposta não existe", null)
 
-                ); 
+                );
 
             }
 
             await prisma.demand.update(
                 {
-                    data: {status: "waitpayment"},
-                    where: {id: demandId}
+                    data: { status: "waitpayment", contract_hash: `${address}`},
+                    where: { id: demandId }
                 }
             )
 
             await prisma.proposal.update(
                 {
-                    data:  { negotiation: "match" },
+                    data: { status: "match" },
                     where: { id: proposalId }
                 }
             );
@@ -294,7 +296,7 @@ class DemandController {
 
             );
 
-        }catch(err){
+        } catch (err) {
             console.log(err);
             return err;
 
@@ -305,20 +307,20 @@ class DemandController {
         try {
 
             const { developerId } = req.params;
-            
-            const TIMEOUT = 30 * 24 * 60 * 60 * 1000; 
+
+            const TIMEOUT = 30 * 24 * 60 * 60 * 1000;
             if (!developerId) {
                 return res.status(400).json(
                     CreateResponse(400, false, "invalid_parameters", "Parâmetros obrigatórios faltando", null)
                 );
             }
-    
+
             const DevProposals = await prisma.proposal.findMany({
                 where: { developerId: developerId }
             });
-    
+
             let proposalsToDecrease = 0;
-    
+
             for (let i = 0; i < DevProposals.length; i++) {
                 const CreatedAtTimestamp = DevProposals[i].createdAt.getTime();
 
@@ -326,7 +328,7 @@ class DemandController {
                     proposalsToDecrease++;
                 }
             }
-    
+
             if (proposalsToDecrease > 0) {
                 const Dev = await prisma.developerProfile.findUnique({ where: { id: developerId } });
                 await prisma.developerProfile.update({
@@ -334,12 +336,12 @@ class DemandController {
                     where: { id: developerId }
                 });
             }
-    
+
             return res.status(201).json(
                 CreateResponse(201, true, "proposal_match", "Sua proposta foi aceita. Mão na massa!", null)
             );
         } catch (err) {
-            console.error(err); 
+            console.error(err);
             return res.status(500).json(
                 CreateResponse(500, false, "internal_server_error", "Erro interno do servidor", null)
             );
@@ -349,13 +351,13 @@ class DemandController {
     async getAllDemand(_: Request, res: Response): Promise<any> {
         try {
             const GetAllDemands = await prisma.demand.findMany();
-    
+
             if (!GetAllDemands || GetAllDemands.length === 0) {
                 return res.status(500).json(
                     CreateResponse(500, false, "not_demand_exist", "Nenhuma demanda existe no momento", null)
                 );
             }
-    
+
             // Converter BigInt para String
             const demandsWithStringBigInt = GetAllDemands.map(demand => {
                 return {
@@ -365,7 +367,7 @@ class DemandController {
                     updateAt: demand.updateAt.toISOString() // Certifique-se de que as datas estão em formato ISO
                 };
             });
-    
+
             return res.status(200).json(CreateResponse(201, true, "list_demand", "Todas as demandas disponíveis estão aqui!", { demands: demandsWithStringBigInt }));
         } catch (err) {
             console.log(err);
@@ -381,15 +383,15 @@ class DemandController {
             const { id } = req.query;
 
             const GetAllDemands = await prisma.demand.findMany(
-                {where: {contractor_id: String(id)}}
+                { where: { contractor_id: String(id) } }
             );
-    
+
             if (!GetAllDemands || GetAllDemands.length === 0) {
                 return res.status(500).json(
                     CreateResponse(500, false, "not_demand_exist", "Nenhuma demanda existe no momento", null)
                 );
             }
-    
+
             // Converter BigInt para String
             const demandsWithStringBigInt = GetAllDemands.map(demand => {
                 return {
@@ -399,7 +401,7 @@ class DemandController {
                     updateAt: demand.updateAt.toISOString() // Certifique-se de que as datas estão em formato ISO
                 };
             });
-    
+
             return res.status(200).json(CreateResponse(201, true, "list_demand", "Todas as demandas disponíveis estão aqui!", { demands: demandsWithStringBigInt }));
         } catch (err) {
             console.log(err);
@@ -408,8 +410,155 @@ class DemandController {
             );
         }
     }
+
+    async getDemandAccepct(req: Request, res: Response): Promise<any> {
+        try {
+
+            const { id }: any = req.query;
+
+            const getDmeand = await prisma.demand.findUnique(
+                { where: { id: id } }
+            );
+
+            const getProposal = await prisma.proposal.findMany(
+                { where: { demandId: id, status: "accepct" } }
+            )
+
+            if (!getProposal || !getDmeand) {
+                return res.status(500).json(
+                    CreateResponse(500, false, "not_match", "Nenhuma demanda existe no momento", null)
+                );
+            }
+
+            const demandMatch = {
+                demand: getDmeand,
+                proposal: getProposal
+            }
+
+            return res.status(200).json(CreateResponse(201, true, "list_demand", "Todas as demandas disponíveis estão aqui!", demandMatch));
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json(
+                CreateResponse(500, false, "internal_server_error", "Erro interno do servidor", null)
+            );
+        }
+    }
+
+    async editDemand(req: Request, res: Response): Promise<any> {
+        try {
+            const { id } = req.params; // ID da demanda a ser editada
+            const { title, value, description, token_address, link_inspiration } = req.body;
+
+            if (!id || !title || value <= 0 || !description || !token_address || !link_inspiration) {
+                return res.status(400).json(
+                    CreateResponse(400, false, "parameters_invalid", "Parâmetros inválidos para atualização.", "")
+                );
+            }
+
+            const existing = await prisma.demand.findUnique({
+                where: { id },
+            });
+
+            if (!existing) {
+                return res.status(404).json(
+                    CreateResponse(404, false, "demand_not_found", "Demanda não encontrada.", "")
+                );
+            }
+
+            await prisma.demand.update({
+                where: { id },
+                data: {
+                    title,
+                    description,
+                    value,
+                    token: token_address,
+                    link_proposal: link_inspiration,
+                },
+            });
+
+            return res.status(200).json(
+                CreateResponse(200, true, "demand_updated", "Demanda atualizada com sucesso!", title)
+            );
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json(
+                CreateResponse(500, false, "internal_server", "Erro no servidor ao editar a demanda.", "")
+            );
+        }
+    }
+
+    async viewProposal(req: Request, res: Response): Promise<any> {
+        try {
+            const { id } = req.params; // id da proposta
+
+            if (!id) {
+                return res.status(400).json(
+                    CreateResponse(400, false, "invalid_parameters", "Missing proposal ID", null)
+                );
+            }
+
+            const proposal = await prisma.proposal.findMany({
+                where: { demandId: id },
+                
+            });
+
+            if (!proposal) {
+                return res.status(404).json(
+                    CreateResponse(404, false, "proposal_not_found", "Proposal not found", null)
+                );
+            }
+
+            return res.status(200).json(
+                CreateResponse(200, true, "proposal_found", "Proposal retrieved successfully", proposal)
+            );
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json(
+                CreateResponse(500, false, "server_error", "Internal server error", null)
+            );
+        }
+    }
+
+    async getUniqueDemand(req: Request, res: Response): Promise<any> {
+        try {
+            const { id } = req.query;
     
+            if (!id) {
+                return res.status(400).json(
+                    CreateResponse(400, false, "missing_id", "O ID da demanda é obrigatório", null)
+                );
+            }
     
-} 
+            const demand = await prisma.demand.findUnique({
+                where: {
+                    id: String(id)
+                }
+            });
+    
+            if (!demand) {
+                return res.status(404).json(
+                    CreateResponse(404, false, "demand_not_found", "Demanda não encontrada", null)
+                );
+            }
+    
+            const demandFormatted = {
+                ...demand,
+                value: demand.value.toString(),
+                createdAt: demand.createdAt.toISOString(),
+                updateAt: demand.updateAt.toISOString()
+            };
+    
+            return res.status(200).json(
+                CreateResponse(200, true, "unique_demand", "Demanda encontrada com sucesso", { demand: demandFormatted })
+            );
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json(
+                CreateResponse(500, false, "internal_server_error", "Erro interno do servidor", null)
+            );
+        }
+    }
+    
+}
 
 export default new DemandController;

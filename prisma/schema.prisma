@@ -47,6 +47,7 @@ model Demand {
   token String
   status String @default("pending")
   contractor_id String
+  contract_hash String?
   proposal Proposal[]
   developer_accepect String
   link_proposal String
@@ -62,6 +63,7 @@ model Proposal {
   developerEmail   String
   proposalValue    String
   timeEstimated    String
+  status String?
   negotiation      String?
   createdAt        DateTime   @default(now())
 }

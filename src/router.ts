@@ -28,8 +28,14 @@ route.post('/demand/proposal=create/:id', DemandController.createProposal);
 route.delete('/demand=delete/:id', DemandController.deleteDemand);
 route.put('/demand/match/:demandId/:proposalId', DemandController.acceptProposal);
 route.put('/proposal/:developerId', DemandController.renewProposal);
+route.put('/demand/edit/:id', DemandController.editDemand);
 route.get('/demand=list', DemandController.getAllDemand);
 route.get('/demand=list/studio', DemandController.getStudioDemand);
+route.get('/demand/accepct/:id', DemandController.getStudioDemand);
+route.get('/proposal=list/:id', DemandController.viewProposal);
+route.get('/demand/unique', DemandController.getUniqueDemand);
+
+
 
 /// ------------------------ PLAN ------------------------------------///
 route.get('/plan/:wallet', PlanController.getPlan);
