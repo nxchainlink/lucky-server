@@ -5,6 +5,7 @@ import DemandController from "./controller/DemandController";
 import PlanController from "./controller/PlanController";
 import PaymentController from "./controller/PaymentController";
 import MarketplaceController from "./controller/MarketplaceController";
+import InitializeController from "./controller/InitializeController";
 
 const route = e.Router();
 
@@ -46,5 +47,7 @@ route.put('/payment=paid/:demandId', PaymentController.pay);
 
 /// ------------------------ MARKETPLACE ------------------------------------///
 route.post('/marketplace=create', MarketplaceController.createItem);
+
+route.get('/run', InitializeController.Message);
 
 export default route;
